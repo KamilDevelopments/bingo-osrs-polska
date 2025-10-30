@@ -1,15 +1,13 @@
-const COLUMNS = 6; // 5 columns
-const ROWS = 5; // 6 rows
-const TOTAL_CELLS = COLUMNS * ROWS; // 30 cells total
+const COLUMNS = 6;
+const ROWS = 5;
+const TOTAL_CELLS = COLUMNS * ROWS;
 
-// DOM elements
 const gridEl = document.getElementById('grid');
 const resetBtn = document.getElementById('resetBtn');
 const exportBtn = document.getElementById('exportBtn');
 const importBtn = document.getElementById('importBtn');
 const importInput = document.getElementById('importInput');
 
-// State management
 const STORAGE_KEY = 'bingo-state';
 
 function loadState() {
@@ -37,7 +35,6 @@ function saveState(state) {
 
 let state = loadState();
 
-// Render the grid
 function renderGrid() {
   gridEl.innerHTML = '';
   gridEl.style.gridTemplateColumns = `repeat(${COLUMNS}, 1fr)`;
@@ -70,7 +67,6 @@ function renderGrid() {
       cell.setAttribute('aria-checked', state[i] ? 'true' : 'false');
     });
     
-    // Keyboard support
     cell.addEventListener('keydown', (e) => {
       if (e.key === 'Enter' || e.key === ' ') {
         e.preventDefault();
