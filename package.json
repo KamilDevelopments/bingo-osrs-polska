@@ -1,0 +1,17 @@
+{
+  "name": "bingo-osrs-polska",
+  "version": "1.0.0",
+  "description": "Interactive Bingo board for OSRS Polska with real-time synchronization",
+  "main": "server.js",
+  "scripts": {
+    "start": "node server.js",
+    "dev": "node server.js"
+  },
+  "keywords": ["bingo", "osrs", "websocket", "real-time"],
+  "author": "",
+  "license": "ISC",
+  "dependencies": {
+    "express": "^4.18.2",
+    "socket.io": "^4.6.1"
+  }
+}
