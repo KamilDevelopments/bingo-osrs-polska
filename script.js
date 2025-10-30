@@ -88,7 +88,7 @@ renderGrid();
 const teamButtons = document.querySelectorAll('.team-btn');
 teamButtons.forEach(btn => {
   btn.addEventListener('click', () => {
-    const team = parseInt(btn.dataset.team);
+    const team = parseInt(btn.dataset.team, 10);
     if (team === currentTeam) return;
     
     // Update active button
@@ -116,7 +116,7 @@ const blob = new Blob([data], {type:'application/json'});
 const url = URL.createObjectURL(blob);
 const a = document.createElement('a');
 a.href = url;
-a.download = 'bingo-state.json';
+a.download = `bingo-state-team${currentTeam}.json`;
 document.body.appendChild(a);
 a.click();
 a.remove();
