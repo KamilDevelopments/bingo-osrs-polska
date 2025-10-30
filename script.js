@@ -8,11 +8,15 @@ const exportBtn = document.getElementById('exportBtn');
 const importBtn = document.getElementById('importBtn');
 const importInput = document.getElementById('importInput');
 
-const STORAGE_KEY = 'bingo-state';
+let currentTeam = 1;
 
-function loadState() {
+function getStorageKey(team) {
+  return `bingo-state-team${team}`;
+}
+
+function loadState(team) {
   try {
-    const stored = localStorage.getItem(STORAGE_KEY);
+    const stored = localStorage.getItem(getStorageKey(team));
     if (stored) {
       const parsed = JSON.parse(stored);
       if (Array.isArray(parsed) && parsed.length === TOTAL_CELLS) {
@@ -25,15 +29,15 @@ function loadState() {
   return new Array(TOTAL_CELLS).fill(false);
 }
 
-function saveState(state) {
+function saveState(state, team) {
   try {
-    localStorage.setItem(STORAGE_KEY, JSON.stringify(state));
+    localStorage.setItem(getStorageKey(team), JSON.stringify(state));
   } catch (e) {
     console.error('Error saving state:', e);
   }
 }
 
-let state = loadState();
+let state = loadState(currentTeam);
 
 function renderGrid() {
   gridEl.innerHTML = '';
@@ -62,7 +66,7 @@ function renderGrid() {
     
     cell.addEventListener('click', () => {
       state[i] = !state[i];
-      saveState(state);
+      saveState(state, currentTeam);
       cell.classList.toggle('marked', state[i]);
       cell.setAttribute('aria-checked', state[i] ? 'true' : 'false');
     });
@@ -80,11 +84,28 @@ function renderGrid() {
 
 renderGrid();
 
+// Team switching
+const teamButtons = document.querySelectorAll('.team-btn');
+teamButtons.forEach(btn => {
+  btn.addEventListener('click', () => {
+    const team = parseInt(btn.dataset.team, 10);
+    if (team === currentTeam) return;
+    
+    // Update active button
+    teamButtons.forEach(b => b.classList.remove('active'));
+    btn.classList.add('active');
+    
+    // Switch team
+    currentTeam = team;
+    state = loadState(currentTeam);
+    renderGrid();
+  });
+});
 
 resetBtn.addEventListener('click', ()=>{
-if(!confirm('Na pewno chcesz zresetować planszę?')) return;
+if(!confirm(`Na pewno chcesz zresetować planszę dla Drużyny ${currentTeam}?`)) return;
 state = new Array(TOTAL_CELLS).fill(false);
-saveState(state);
+saveState(state, currentTeam);
 renderGrid();
 });
 
@@ -95,7 +116,7 @@ const blob = new Blob([data], {type:'application/json'});
 const url = URL.createObjectURL(blob);
 const a = document.createElement('a');
 a.href = url;
-a.download = 'bingo-state.json';
+a.download = `bingo-state-team${currentTeam}.json`;
 document.body.appendChild(a);
 a.click();
 a.remove();
@@ -112,9 +133,9 @@ const text = await f.text();
 const parsed = JSON.parse(text);
 if(!Array.isArray(parsed) || parsed.length !== TOTAL_CELLS) throw new Error('Niewłaściwy format');
 state = parsed.map(v=>!!v);
-saveState(state);
+saveState(state, currentTeam);
 renderGrid();
-alert('Zaimportowano stan');
+alert(`Zaimportowano stan dla Drużyny ${currentTeam}`);
 }catch(err){
 alert('Błąd importu pliku: '+err.message);
 }
