@@ -1,0 +1,40 @@
+<!doctype html>
+<html lang="pl">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>Bingo — interaktywna plansza</title>
+<link rel="stylesheet" href="style.css">
+</head>
+<body>
+<main class="container">
+<h1>Bingo — interaktywna plansza</h1>
+
+
+<div class="board-wrapper" aria-label="Plansza Bingo">
+<!-- tło : obrazek w ./images/bingo.png -->
+<img src="images/bingo.png" alt="Bingo" class="board-image" id="boardImage">
+
+
+<!-- Siatka 5x5 pól nakładana absolutnie nad obrazkiem -->
+<div id="grid" class="grid" role="grid" aria-label="Siatka 5 na 5">
+<!-- pola generowane JS -->
+</div>
+</div>
+
+
+<div class="controls">
+<button id="resetBtn">Resetuj</button>
+<button id="exportBtn">Eksportuj stan (JSON)</button>
+<button id="importBtn">Importuj stan</button>
+<input id="importInput" type="file" accept="application/json" style="display:none">
+</div>
+
+
+<p class="note">Kliknij pole, żeby je zaznaczyć. Stan zapisywany jest lokalnie (localStorage).</p>
+</main>
+
+
+<script src="script.js"></script>
+</body>
+</html>
