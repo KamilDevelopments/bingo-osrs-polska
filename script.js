@@ -1,4 +1,6 @@
-const GRID_SIZE = 5; // 5x5
+const COLUMNS = 5; // 5 columns
+const ROWS = 6; // 6 rows
+const TOTAL_CELLS = COLUMNS * ROWS; // 30 cells total
 
 // DOM elements
 const gridEl = document.getElementById('grid');
@@ -15,14 +17,14 @@ function loadState() {
     const stored = localStorage.getItem(STORAGE_KEY);
     if (stored) {
       const parsed = JSON.parse(stored);
-      if (Array.isArray(parsed) && parsed.length === GRID_SIZE * GRID_SIZE) {
+      if (Array.isArray(parsed) && parsed.length === TOTAL_CELLS) {
         return parsed;
       }
     }
   } catch (e) {
     console.error('Error loading state:', e);
   }
-  return new Array(GRID_SIZE * GRID_SIZE).fill(false);
+  return new Array(TOTAL_CELLS).fill(false);
 }
 
 function saveState(state) {
@@ -38,8 +40,10 @@ let state = loadState();
 // Render the grid
 function renderGrid() {
   gridEl.innerHTML = '';
+  gridEl.style.gridTemplateColumns = `repeat(${COLUMNS}, 1fr)`;
+  gridEl.style.gridTemplateRows = `repeat(${ROWS}, 1fr)`;
   
-  for (let i = 0; i < GRID_SIZE * GRID_SIZE; i++) {
+  for (let i = 0; i < TOTAL_CELLS; i++) {
     const cell = document.createElement('div');
     cell.className = 'cell';
     cell.setAttribute('role', 'checkbox');
@@ -83,7 +87,7 @@ renderGrid();
 
 resetBtn.addEventListener('click', ()=>{
 if(!confirm('Na pewno chcesz zresetować planszę?')) return;
-state = new Array(GRID_SIZE*GRID_SIZE).fill(false);
+state = new Array(TOTAL_CELLS).fill(false);
 saveState(state);
 renderGrid();
 });
@@ -110,7 +114,7 @@ if(!f) return;
 try{
 const text = await f.text();
 const parsed = JSON.parse(text);
-if(!Array.isArray(parsed) || parsed.length !== GRID_SIZE*GRID_SIZE) throw new Error('Niewłaściwy format');
+if(!Array.isArray(parsed) || parsed.length !== TOTAL_CELLS) throw new Error('Niewłaściwy format');
 state = parsed.map(v=>!!v);
 saveState(state);
 renderGrid();
