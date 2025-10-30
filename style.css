@@ -5,7 +5,7 @@
 
 
 *{box-sizing:border-box}
-body{font-family:Inter,system-ui,Segoe UI,Roboto,Arial,sans-serif;margin:0;padding:24px;background:#f6f7fb;color:#111}
+body{font-family:Inter,system-ui,Segoe UI,Roboto,Arial,sans-serif;margin:0;padding:24px;background:#007bff;color:#111}
 .container{max-width:960px;margin:0 auto}
 h1{font-size:1.25rem;margin-bottom:12px}
 .board-wrapper{position:relative;width:var(--size);height:var(--size);margin:0 auto;border-radius:12px;overflow:hidden;box-shadow:0 8px 24px rgba(16,24,40,0.08);background:#fff}
