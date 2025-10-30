@@ -1,5 +1,5 @@
-const COLUMNS = 5; // 5 columns
-const ROWS = 6; // 6 rows
+const COLUMNS = 6; // 5 columns
+const ROWS = 5; // 6 rows
 const TOTAL_CELLS = COLUMNS * ROWS; // 30 cells total
 
 // DOM elements
