@@ -1,30 +1,82 @@
 const GRID_SIZE = 5; // 5x5
-const overlay = document.createElement('div');
-overlay.className = 'cell-overlay';
 
+// DOM elements
+const gridEl = document.getElementById('grid');
+const resetBtn = document.getElementById('resetBtn');
+const exportBtn = document.getElementById('exportBtn');
+const importBtn = document.getElementById('importBtn');
+const importInput = document.getElementById('importInput');
 
-const mark = document.createElement('div');
-mark.className = 'mark';
+// State management
+const STORAGE_KEY = 'bingo-state';
 
-
-cell.appendChild(overlay);
-cell.appendChild(mark);
-
-
-cell.addEventListener('click', ()=>{
-state[idx] = !state[idx];
-saveState(state);
-// aktualizuj aria i klasę
-cell.classList.toggle('marked', state[idx]);
-cell.setAttribute('aria-checked', state[idx] ? 'true' : 'false');
-});
-
-
-gridEl.appendChild(cell);
+function loadState() {
+  try {
+    const stored = localStorage.getItem(STORAGE_KEY);
+    if (stored) {
+      const parsed = JSON.parse(stored);
+      if (Array.isArray(parsed) && parsed.length === GRID_SIZE * GRID_SIZE) {
+        return parsed;
+      }
+    }
+  } catch (e) {
+    console.error('Error loading state:', e);
+  }
+  return new Array(GRID_SIZE * GRID_SIZE).fill(false);
 }
-}
+
+function saveState(state) {
+  try {
+    localStorage.setItem(STORAGE_KEY, JSON.stringify(state));
+  } catch (e) {
+    console.error('Error saving state:', e);
+  }
 }
 
+let state = loadState();
+
+// Render the grid
+function renderGrid() {
+  gridEl.innerHTML = '';
+  
+  for (let i = 0; i < GRID_SIZE * GRID_SIZE; i++) {
+    const cell = document.createElement('div');
+    cell.className = 'cell';
+    cell.setAttribute('role', 'checkbox');
+    cell.setAttribute('aria-checked', state[i] ? 'true' : 'false');
+    cell.setAttribute('tabindex', '0');
+    
+    if (state[i]) {
+      cell.classList.add('marked');
+    }
+    
+    const overlay = document.createElement('div');
+    overlay.className = 'cell-overlay';
+    
+    const mark = document.createElement('div');
+    mark.className = 'mark';
+    
+    cell.appendChild(overlay);
+    cell.appendChild(mark);
+    
+    cell.addEventListener('click', () => {
+      state[i] = !state[i];
+      saveState(state);
+      cell.classList.toggle('marked', state[i]);
+      cell.setAttribute('aria-checked', state[i] ? 'true' : 'false');
+    });
+    
+    // Keyboard support
+    cell.addEventListener('keydown', (e) => {
+      if (e.key === 'Enter' || e.key === ' ') {
+        e.preventDefault();
+        cell.click();
+      }
+    });
+    
+    gridEl.appendChild(cell);
+  }
+}
 
 renderGrid();
 
