@@ -9,6 +9,59 @@ const importBtn = document.getElementById('importBtn');
 const importInput = document.getElementById('importInput');
 
 let currentTeam = 1;
+let socket = null;
+let isConnected = false;
+
+// Initialize Socket.IO connection
+function initSocket() {
+  // Connect to the server (defaults to same host)
+  socket = io();
+  
+  socket.on('connect', () => {
+    console.log('Connected to server');
+    isConnected = true;
+    // Request current state for the current team
+    socket.emit('requestState', currentTeam);
+  });
+  
+  socket.on('disconnect', () => {
+    console.log('Disconnected from server');
+    isConnected = false;
+  });
+  
+  // Listen for tile updates from server
+  socket.on('tileUpdated', (data) => {
+    const { team, index, value } = data;
+    
+    // Only update if it's for the current team
+    if (team === currentTeam) {
+      state[index] = value;
+      saveState(state, currentTeam);
+      updateCellDisplay(index);
+    }
+  });
+  
+  // Listen for full state updates from server
+  socket.on('stateUpdate', (data) => {
+    const { team, state: newState } = data;
+    
+    // Only update if it's for the current team
+    if (team === currentTeam) {
+      state = newState;
+      saveState(state, currentTeam);
+      renderGrid();
+    }
+  });
+}
+
+// Update a single cell's display without re-rendering entire grid
+function updateCellDisplay(index) {
+  const cells = gridEl.querySelectorAll('.cell');
+  if (cells[index]) {
+    cells[index].classList.toggle('marked', state[index]);
+    cells[index].setAttribute('aria-checked', state[index] ? 'true' : 'false');
+  }
+}
 
 function getStorageKey(team) {
   return `bingo-state-team${team}`;
@@ -69,6 +122,15 @@ function renderGrid() {
       saveState(state, currentTeam);
       cell.classList.toggle('marked', state[i]);
       cell.setAttribute('aria-checked', state[i] ? 'true' : 'false');
+      
+      // Emit socket event for real-time sync
+      if (socket && isConnected) {
+        socket.emit('toggleTile', {
+          team: currentTeam,
+          index: i,
+          value: state[i]
+        });
+      }
     });
     
     cell.addEventListener('keydown', (e) => {
@@ -99,6 +161,11 @@ teamButtons.forEach(btn => {
     currentTeam = team;
     state = loadState(currentTeam);
     renderGrid();
+    
+    // Request latest state from server for this team
+    if (socket && isConnected) {
+      socket.emit('requestState', currentTeam);
+    }
   });
 });
 
@@ -107,6 +174,14 @@ if(!confirm(`Na pewno chcesz zresetować planszę dla Drużyny ${currentTeam}?`)
 state = new Array(TOTAL_CELLS).fill(false);
 saveState(state, currentTeam);
 renderGrid();
+
+// Emit socket event for real-time sync
+if (socket && isConnected) {
+  socket.emit('updateState', {
+    team: currentTeam,
+    state: state
+  });
+}
 });
 
 
@@ -136,6 +211,14 @@ state = parsed.map(v=>!!v);
 saveState(state, currentTeam);
 renderGrid();
 alert(`Zaimportowano stan dla Drużyny ${currentTeam}`);
+
+// Emit socket event for real-time sync
+if (socket && isConnected) {
+  socket.emit('updateState', {
+    team: currentTeam,
+    state: state
+  });
+}
 }catch(err){
 alert('Błąd importu pliku: '+err.message);
 }
@@ -144,5 +227,6 @@ alert('Błąd importu pliku: '+err.message);
 
 // Drobne usprawnienia: przy zmianie rozmiaru obrazka — zachowaj padding i proporcje
 window.addEventListener('load', ()=>{
-// nic szczególnego na razie
+// Initialize socket connection
+initSocket();
 });

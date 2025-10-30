@@ -16,18 +16,47 @@ This site is configured to deploy automatically to GitHub Pages when changes are
 
 ### Local Development
 
-To test locally, simply open `index.html` in a web browser or use a local server:
+The application now includes real-time synchronization using WebSocket (Socket.IO).
 
+1. Install dependencies:
 ```bash
-python3 -m http.server 8000
+npm install
 ```
 
-Then visit `http://localhost:8000`
+2. Start the server:
+```bash
+npm start
+```
+
+3. Open your browser and visit `http://localhost:3000`
+
+To test real-time sync, open the URL in multiple browser windows or on different devices connected to the same network.
 
 ## Features
 
-- 5x5 Bingo grid overlay on a background image
+- 6x5 Bingo grid overlay on a background image (6 columns, 5 rows)
 - Click cells to mark them
-- State is saved in localStorage
+- **Real-time synchronization** - tile updates sync across all connected users
+- State is saved in localStorage and synchronized via WebSocket
+- Support for 5 different teams
 - Export/Import state as JSON
 - Responsive design
+
+## Technology Stack
+
+- Frontend: HTML, CSS, JavaScript
+- Backend: Node.js, Express
+- Real-time Communication: Socket.IO
+
+## Security
+
+For production deployment, it's recommended to set the `ALLOWED_ORIGINS` environment variable to restrict which domains can connect to the WebSocket server:
+
+```bash
+ALLOWED_ORIGINS=https://kamildevelopments.github.io npm start
+```
+
+For multiple origins, separate them with commas:
+```bash
+ALLOWED_ORIGINS=https://kamildevelopments.github.io,https://example.com npm start
+```
