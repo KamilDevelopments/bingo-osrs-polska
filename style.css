@@ -13,7 +13,7 @@ h1{font-size:1.25rem;margin-bottom:12px}
 
 
 /* siatka nakładana */
-.grid{position:absolute;inset:0;display:grid;grid-template-columns:repeat(5,1fr);grid-template-rows:repeat(5,1fr);gap:var(--cell-gap);padding:6px}
+.grid{position:absolute;inset:0;display:grid;gap:var(--cell-gap);padding:6px}
 .cell{position:relative;display:flex;align-items:center;justify-content:center;cursor:pointer;border-radius:6px;transition:transform .08s ease, box-shadow .08s ease}
 .cell:active{transform:scale(.98)}
 .cell-overlay{position:absolute;inset:0;border-radius:6px}
