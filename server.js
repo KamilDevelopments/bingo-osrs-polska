@@ -7,23 +7,28 @@ const app = express();
 const server = http.createServer(app);
 const io = socketIo(server, {
   cors: {
-    origin: "*",
+    origin: process.env.ALLOWED_ORIGINS ? process.env.ALLOWED_ORIGINS.split(',') : "*",
     methods: ["GET", "POST"]
   }
 });
 
 const PORT = process.env.PORT || 3000;
 
+// Grid configuration
+const COLUMNS = 6;
+const ROWS = 5;
+const TOTAL_CELLS = COLUMNS * ROWS;
+
 // Serve static files
 app.use(express.static(path.join(__dirname)));
 
-// Store the current state for each team (5 teams, each with 30 cells)
+// Store the current state for each team (5 teams, each with TOTAL_CELLS cells)
 const teamStates = {
-  1: new Array(30).fill(false),
-  2: new Array(30).fill(false),
-  3: new Array(30).fill(false),
-  4: new Array(30).fill(false),
-  5: new Array(30).fill(false)
+  1: new Array(TOTAL_CELLS).fill(false),
+  2: new Array(TOTAL_CELLS).fill(false),
+  3: new Array(TOTAL_CELLS).fill(false),
+  4: new Array(TOTAL_CELLS).fill(false),
+  5: new Array(TOTAL_CELLS).fill(false)
 };
 
 // Handle WebSocket connections
@@ -32,7 +37,8 @@ io.on('connection', (socket) => {
 
   // Send current state to newly connected client
   socket.on('requestState', (team) => {
-    if (teamStates[team]) {
+    // Validate team parameter
+    if (typeof team === 'number' && team >= 1 && team <= 5 && teamStates[team]) {
       socket.emit('stateUpdate', { team, state: teamStates[team] });
     }
   });
@@ -42,7 +48,9 @@ io.on('connection', (socket) => {
     const { team, index, value } = data;
     
     // Validate input
-    if (team >= 1 && team <= 5 && index >= 0 && index < 30) {
+    if (typeof team === 'number' && team >= 1 && team <= 5 && 
+        typeof index === 'number' && index >= 0 && index < TOTAL_CELLS &&
+        typeof value === 'boolean') {
       // Update server state
       teamStates[team][index] = value;
       
@@ -56,7 +64,9 @@ io.on('connection', (socket) => {
     const { team, state } = data;
     
     // Validate input
-    if (team >= 1 && team <= 5 && Array.isArray(state) && state.length === 30) {
+    if (typeof team === 'number' && team >= 1 && team <= 5 && 
+        Array.isArray(state) && state.length === TOTAL_CELLS &&
+        state.every(v => typeof v === 'boolean')) {
       // Update server state
       teamStates[team] = state;
       

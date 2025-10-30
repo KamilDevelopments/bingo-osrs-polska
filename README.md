@@ -34,7 +34,7 @@ To test real-time sync, open the URL in multiple browser windows or on different
 
 ## Features
 
-- 5x6 Bingo grid overlay on a background image
+- 6x5 Bingo grid overlay on a background image (6 columns, 5 rows)
 - Click cells to mark them
 - **Real-time synchronization** - tile updates sync across all connected users
 - State is saved in localStorage and synchronized via WebSocket
@@ -47,3 +47,16 @@ To test real-time sync, open the URL in multiple browser windows or on different
 - Frontend: HTML, CSS, JavaScript
 - Backend: Node.js, Express
 - Real-time Communication: Socket.IO
+
+## Security
+
+For production deployment, it's recommended to set the `ALLOWED_ORIGINS` environment variable to restrict which domains can connect to the WebSocket server:
+
+```bash
+ALLOWED_ORIGINS=https://kamildevelopments.github.io npm start
+```
+
+For multiple origins, separate them with commas:
+```bash
+ALLOWED_ORIGINS=https://kamildevelopments.github.io,https://example.com npm start
+```
